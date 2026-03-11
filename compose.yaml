@@ -24,7 +24,6 @@ services:
       - PLUGINS_YOUTUBE_CLIENTS_1=MUSIC
       - PLUGINS_YOUTUBE_CLIENTS_2=WEB
       - PLUGINS_YOUTUBE_CLIENTS_3=WEBEMBEDDED
-      - PLUGINS_YOUTUBE_CLIENTS_4=TVHTML5EMBEDDED
     volumes:
       # Mount application.yml from the same directory or use environment variables
       - ./Lavalink/application.yml:/opt/Lavalink/application.yml
@@ -36,7 +35,7 @@ services:
     ports:
       - "2333:2333"
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:2333/version | grep -q '40[01]' && exit 0 || exit 1"]
+      test: ["CMD-SHELL", "curl -sf -H 'Authorization: youshallnotpass' http://localhost:2333/version || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 5
