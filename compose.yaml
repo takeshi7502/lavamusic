@@ -12,6 +12,7 @@ services:
     environment:
       - _JAVA_OPTIONS=-Xmx2G # Limit memory usage to 2GB
       - SERVER_PORT=2333
+      - LAVALINK_SERVER_PASSWORD=youshallnotpass
     volumes:
       # Mount application.yml from the same directory or use environment variables
       - ./Lavalink/application.yml:/opt/Lavalink/application.yml

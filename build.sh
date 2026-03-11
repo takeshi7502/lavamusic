@@ -37,7 +37,17 @@ if grep -q '"host":"localhost"' .env 2>/dev/null; then
     echo "✅ Đã cập nhật NODES host thành 'lavalink'."
 fi
 
-# Bước 4: Phân quyền thư mục Lavalink cho container (user 322)
+# Bước 5: Chuyển đổi line endings từ Windows (CRLF) sang Linux (LF)
+# (Quan trọng khi code được viết trên Windows nhưng chạy trên Linux Docker)
+echo "📝 Đang chuyển đổi line endings cho các file cấu hình..."
+if command -v sed &> /dev/null; then
+    sed -i 's/\r$//' ./Lavalink/application.yml 2>/dev/null || true
+    sed -i 's/\r$//' ./entrypoint.sh 2>/dev/null || true
+    sed -i 's/\r$//' ./.env 2>/dev/null || true
+    echo "✅ Đã chuyển đổi line endings."
+fi
+
+# Bước 6: Phân quyền thư mục Lavalink cho container (user 322)
 if [ -d "./Lavalink" ]; then
     echo "🔒 Đang phân quyền thư mục Lavalink..."
     sudo chown -R 322:322 ./Lavalink 2>/dev/null || true
