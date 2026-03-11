@@ -21,18 +21,17 @@ services:
       - PLUGINS_YOUTUBE_ALLOWDIRECTVIDEOIDS=true
       - PLUGINS_YOUTUBE_ALLOWDIRECTPLAYLISTIDS=true
       # Enable OAuth2 - REQUIRED for VPS (datacenter IPs blocked by YouTube without login)
-      # First run: Lavalink will print a URL + code in logs. Visit the URL, enter the code with a burner Google account.
-      # After that, Lavalink will print a refreshToken. Add it below to skip this step on future restarts.
       - PLUGINS_YOUTUBE_OAUTH_ENABLED=true
-      # - PLUGINS_YOUTUBE_OAUTH_REFRESHTOKEN=your_token_here  # Uncomment after getting token from logs
+      - PLUGINS_YOUTUBE_OAUTH_REFRESHTOKEN=${YT_REFRESH_TOKEN}
       # YouTube clients - order matters, first working client wins
-      - PLUGINS_YOUTUBE_CLIENTS_0=MUSIC
-      - PLUGINS_YOUTUBE_CLIENTS_1=ANDROID_TESTSUITE
-      - PLUGINS_YOUTUBE_CLIENTS_2=ANDROID_MUSIC
-      - PLUGINS_YOUTUBE_CLIENTS_3=WEB
-      - PLUGINS_YOUTUBE_CLIENTS_4=WEBEMBEDDED
-      # Log level to see OAuth token in logs
-      - LOGGING_LEVEL_DEV_LAVALINK_YOUTUBE=DEBUG
+      # WEB first for regular YouTube search, ANDROID_MUSIC for playback
+      - PLUGINS_YOUTUBE_CLIENTS_0=WEB
+      - PLUGINS_YOUTUBE_CLIENTS_1=ANDROID_MUSIC
+      - PLUGINS_YOUTUBE_CLIENTS_2=ANDROID_TESTSUITE
+      - PLUGINS_YOUTUBE_CLIENTS_3=ANDROID_VR
+      - PLUGINS_YOUTUBE_CLIENTS_4=MUSIC
+      # Log level for YouTube plugin
+      - LOGGING_LEVEL_DEV_LAVALINK_YOUTUBE=INFO
     volumes:
       # Mount application.yml from the same directory or use environment variables
       - ./Lavalink/application.yml:/opt/Lavalink/application.yml
