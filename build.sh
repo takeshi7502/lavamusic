@@ -55,7 +55,11 @@ if [ -d "./lavamusic.db" ]; then
     echo "✅ Đã xoá thư mục lavamusic.db lỗi."
 fi
 
-# Bước 7: Build lại image từ mã nguồn mới nhất
+# Bước 7: Xoá Docker BuildKit cache cũ (tránh lỗi snapshot hỏng)
+echo "🧹 Đang xoá Docker build cache cũ..."
+sudo docker builder prune -af 2>/dev/null || true
+
+# Bước 8: Build lại image từ mã nguồn mới nhất
 echo "⚙️  Đang build lại image từ mã nguồn mới nhất..."
 if ! sudo docker compose build --no-cache lavamusic; then
     echo "❌ Build thất bại! Kiểm tra lại Dockerfile và mã nguồn."
