@@ -88,6 +88,65 @@ if [ -d "./Lavalink" ]; then
 
     echo "✅ Plugin check hoàn tất."
 
+    # Patch application.yml: fix CRLF, OAuth, and YouTube clients
+    echo "🔧 Patching application.yml..."
+    APP_YML="./Lavalink/application.yml"
+    if [ -f "$APP_YML" ]; then
+        # Convert CRLF to LF
+        sed -i 's/\r$//' "$APP_YML"
+
+        # Read refresh token from .env if available
+        if [ -f ".env" ]; then
+            YT_TOKEN=$(grep '^YT_REFRESH_TOKEN=' .env | sed 's/^YT_REFRESH_TOKEN=//' | sed 's/^"//' | sed 's/"$//')
+        fi
+
+        # Fix OAuth: uncomment and set refreshToken if we have one
+        if [ -n "$YT_TOKEN" ]; then
+            # Replace commented refreshToken line with actual token
+            sed -i "s|.*# refreshToken:.*|      refreshToken: \"$YT_TOKEN\"|" "$APP_YML"
+            # Also replace if it's already uncommented but has wrong value
+            sed -i "s|refreshToken:.*|refreshToken: \"$YT_TOKEN\"|" "$APP_YML"
+            echo "   ✅ OAuth refreshToken đã được cập nhật."
+        fi
+
+        # Fix YouTube clients: replace client list with OAuth-compatible ones
+        # Replace the clients block using Python for reliable YAML editing
+        python3 -c "
+import re
+with open('$APP_YML', 'r') as f:
+    content = f.read()
+
+# Remove per-client config blocks (ANDROID_MUSIC:, MUSIC:, WEB:, etc. under youtube:)
+# These cause issues with OAuth registration
+patterns_to_remove = [
+    r'    ANDROID_MUSIC:\n(?:      \w+: (?:true|false)\n)+',
+    r'    MUSIC:\n(?:      \w+: (?:true|false)\n)+',
+    r'    WEB:\n(?:      \w+: (?:true|false)\n)+',
+    r'    WEBEMBEDDED:\n(?:      \w+: (?:true|false)\n)+',
+    r'    TVHTML5EMBEDDED:\n(?:      \w+: (?:true|false)\n)+',
+]
+for pat in patterns_to_remove:
+    content = re.sub(pat, '', content)
+
+# Replace clients list
+old_clients = re.search(r'    clients:\n((?:      - .*\n)+)', content)
+if old_clients:
+    new_clients = '''    clients:
+      - ANDROID_MUSIC
+      - ANDROID_VR
+      - WEB
+      - MUSIC
+'''
+    content = content[:old_clients.start()] + new_clients + content[old_clients.end():]
+
+with open('$APP_YML', 'w') as f:
+    f.write(content)
+print('   ✅ YouTube clients đã được cập nhật.')
+" 2>/dev/null || echo "   ⚠️ Không thể patch clients (Python3 không có), bỏ qua."
+
+        echo "✅ application.yml đã được patch."
+    fi
+
     sudo chown -R 322:322 ./Lavalink 2>/dev/null || true
     echo "✅ Đã phân quyền Lavalink."
 fi
