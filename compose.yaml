@@ -13,25 +13,8 @@ services:
       - _JAVA_OPTIONS=-Xmx2G # Limit memory usage to 2GB
       - SERVER_PORT=2333
       - LAVALINK_SERVER_PASSWORD=youshallnotpass
-      # Disable deprecated built-in YouTube source (MUST use youtube-source plugin instead)
+      # Disable deprecated built-in YouTube source (youtube-source plugin handles it via application.yml)
       - LAVALINK_SERVER_SOURCES_YOUTUBE=false
-      # Configure youtube-source plugin
-      - PLUGINS_YOUTUBE_ENABLED=true
-      - PLUGINS_YOUTUBE_ALLOWSEARCH=true
-      - PLUGINS_YOUTUBE_ALLOWDIRECTVIDEOIDS=true
-      - PLUGINS_YOUTUBE_ALLOWDIRECTPLAYLISTIDS=true
-      # Enable OAuth2 - REQUIRED for VPS (datacenter IPs blocked by YouTube without login)
-      - PLUGINS_YOUTUBE_OAUTH_ENABLED=true
-      - PLUGINS_YOUTUBE_OAUTH_REFRESHTOKEN=${YT_REFRESH_TOKEN}
-      # YouTube clients - order matters, first working client wins
-      # WEB first for regular YouTube search, ANDROID_MUSIC for playback
-      - PLUGINS_YOUTUBE_CLIENTS_0=WEB
-      - PLUGINS_YOUTUBE_CLIENTS_1=ANDROID_MUSIC
-      - PLUGINS_YOUTUBE_CLIENTS_2=ANDROID_TESTSUITE
-      - PLUGINS_YOUTUBE_CLIENTS_3=ANDROID_VR
-      - PLUGINS_YOUTUBE_CLIENTS_4=MUSIC
-      # Log level for YouTube plugin
-      - LOGGING_LEVEL_DEV_LAVALINK_YOUTUBE=INFO
     volumes:
       # Mount application.yml from the same directory or use environment variables
       - ./Lavalink/application.yml:/opt/Lavalink/application.yml
