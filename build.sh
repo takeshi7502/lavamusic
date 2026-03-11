@@ -50,6 +50,44 @@ fi
 # Bước 6: Phân quyền thư mục Lavalink cho container (user 322)
 if [ -d "./Lavalink" ]; then
     echo "🔒 Đang phân quyền thư mục Lavalink..."
+    # Tạo thư mục plugins nếu chưa có
+    mkdir -p ./Lavalink/plugins
+
+    # Tải plugin JARs nếu thiếu (bị gitignore nên VPS không có)
+    echo "🔌 Kiểm tra và tải plugin Lavalink..."
+    PLUGINS_DIR="./Lavalink/plugins"
+    MAVEN_RELEASE="https://maven.lavalink.dev/releases"
+    MAVEN_SNAPSHOT="https://maven.lavalink.dev/snapshots"
+    JITPACK="https://jitpack.io"
+
+    download_plugin() {
+        local url="$1"
+        local filename="$2"
+        if [ ! -f "$PLUGINS_DIR/$filename" ]; then
+            echo "   ⬇️  Đang tải $filename..."
+            curl -sL "$url" -o "$PLUGINS_DIR/$filename" || echo "   ⚠️  Không thể tải $filename"
+        else
+            echo "   ✅ $filename đã có sẵn."
+        fi
+    }
+
+    # youtube-source plugin (quan trọng nhất - cho YouTube playback)
+    download_plugin "https://github.com/lavalink-devs/youtube-source/releases/download/1.18.0/youtube-plugin-1.18.0.jar" "youtube-plugin-1.18.0.jar"
+    # LavaSrc - Spotify, Deezer, etc.
+    download_plugin "$MAVEN_RELEASE/com/github/topi314/lavasrc/lavasrc-plugin/4.8.1/lavasrc-plugin-4.8.1.jar" "lavasrc-plugin-4.8.1.jar"
+    # LavaSearch
+    download_plugin "$MAVEN_RELEASE/com/github/topi314/lavasearch/lavasearch-plugin/1.0.0/lavasearch-plugin-1.0.0.jar" "lavasearch-plugin-1.0.0.jar"
+    # LavaLyrics
+    download_plugin "$MAVEN_RELEASE/com/github/topi314/lavalyrics/lavalyrics-plugin/1.1.0/lavalyrics-plugin-1.1.0.jar" "lavalyrics-plugin-1.1.0.jar"
+    # Skybot
+    download_plugin "$MAVEN_RELEASE/com/dunctebot/skybot-lavalink-plugin/1.7.0/skybot-lavalink-plugin-1.7.0.jar" "skybot-lavalink-plugin-1.7.0.jar"
+    # Java Lyrics
+    download_plugin "$MAVEN_RELEASE/me/duncte123/java-lyrics-plugin/1.6.6/java-lyrics-plugin-1.6.6.jar" "java-lyrics-plugin-1.6.6.jar"
+    # LavaDSPX
+    download_plugin "$JITPACK/com/github/devoxin/lavadspx-plugin/0.0.5/lavadspx-plugin-0.0.5.jar" "lavadspx-plugin-0.0.5.jar"
+
+    echo "✅ Plugin check hoàn tất."
+
     sudo chown -R 322:322 ./Lavalink 2>/dev/null || true
     echo "✅ Đã phân quyền Lavalink."
 fi
